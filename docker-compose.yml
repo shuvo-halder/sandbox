@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  # FastAPI Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - CORS_ORIGINS=http://localhost:3000
+    networks:
+      - mbs-net
+    depends_on:
+      - redis
+
+  # Redis for celery/message broker
+  redis:
+    image: redis:7-alpine
+    networks:
+      - mbs-net
+
+  # React Frontend (served via Node or Nginx)
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "3000:80"
+    networks:
+      - mbs-net
+    depends_on:
+      - backend
+
+  # Go Collector Sandbox (Simulated)
+  # In a real environment, this runs INSIDE the isolated sandbox.
+  sandbox:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.sandbox
+    privileged: true # Required for cgroups and some /proc interactions
+    environment:
+      - MBS_API_URL=http://backend:8000/api/v1/events
+    networks:
+      - mbs-isolated-net
+      - mbs-net # For reporting to backend
+    depends_on:
+      - backend
+
+networks:
+  mbs-net:
+    driver: bridge
+  mbs-isolated-net:
+    driver: bridge
+    internal: true # Isolated network for the sandbox

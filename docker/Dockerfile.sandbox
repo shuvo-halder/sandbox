@@ -1,0 +1,25 @@
+# Build the Go collector
+FROM golang:1.20 AS builder
+WORKDIR /app
+COPY monitoring/go.mod ./
+RUN go mod download || true
+COPY monitoring/ ./
+RUN CGO_ENABLED=0 GOOS=linux go build -o /monitor cmd/monitor/main.go
+
+# Create the sandbox environment
+FROM ubuntu:22.04
+WORKDIR /sandbox
+
+# Install basic networking and tracing tools
+RUN apt-get update && apt-get install -y \
+    inotify-tools \
+    iproute2 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /monitor /usr/local/bin/monitor
+COPY docker/sandbox-entrypoint.sh /usr/local/bin/sandbox-entrypoint.sh
+RUN chmod +x /usr/local/bin/sandbox-entrypoint.sh
+
+# The sandbox runs the monitor by default
+ENTRYPOINT ["/usr/local/bin/sandbox-entrypoint.sh"]
