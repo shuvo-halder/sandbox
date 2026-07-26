@@ -20,7 +20,7 @@ export default function Dashboard() {
       client.get('/dashboard/recent'),
     ]).then(([s, a]) => {
       setStats(s.data);
-      setActivities(a.data);
+      setActivities(a.data.items || []);
     }).catch(err => {
       console.error(err);
       setError('Failed to load dashboard data. Engine might be offline.');

@@ -25,8 +25,8 @@ class AnalysisSession(Base):
     __tablename__ = "sessions"
     id = Column(String, primary_key=True, index=True)
     sample_name = Column(String)
-    status = Column(String) # running, completed
-    created_at = Column(DateTime, default=datetime.utcnow)
+    status = Column(String, index=True) # running, completed
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
     
     events = relationship("TelemetryEventModel", back_populates="session")
     reports = relationship("Report", back_populates="session")
@@ -34,9 +34,9 @@ class AnalysisSession(Base):
 class TelemetryEventModel(Base):
     __tablename__ = "events"
     id = Column(Integer, primary_key=True, index=True)
-    session_id = Column(String, ForeignKey("sessions.id"))
-    timestamp = Column(DateTime, default=datetime.utcnow)
-    type = Column(String) # process, network, file, alert
+    session_id = Column(String, ForeignKey("sessions.id"), index=True)
+    timestamp = Column(DateTime, default=datetime.utcnow, index=True)
+    type = Column(String, index=True) # process, network, file, alert
     title = Column(String)
     description = Column(String)
     severity = Column(String)
@@ -46,9 +46,38 @@ class TelemetryEventModel(Base):
 class Report(Base):
     __tablename__ = "reports"
     id = Column(String, primary_key=True, index=True)
-    session_id = Column(String, ForeignKey("sessions.id"))
+    session_id = Column(String, ForeignKey("sessions.id"), index=True)
     format = Column(String)
     file_size = Column(Integer)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
     
     session = relationship("AnalysisSession", back_populates="reports")
+
+class ProcessEventModel(Base):
+    __tablename__ = "process_events"
+    id = Column(Integer, primary_key=True, index=True)
+    session_id = Column(String, ForeignKey("sessions.id"), index=True)
+    timestamp = Column(DateTime, default=datetime.utcnow, index=True)
+    event_type = Column(String) # create, terminate
+    pid = Column(Integer)
+    ppid = Column(Integer)
+    process_name = Column(String)
+    cpu_usage = Column(Float)
+    memory_usage = Column(Integer)
+    
+    session = relationship("AnalysisSession", backref="process_events")
+
+class NetworkEventModel(Base):
+    __tablename__ = "network_events"
+    id = Column(Integer, primary_key=True, index=True)
+    session_id = Column(String, ForeignKey("sessions.id"), index=True)
+    timestamp = Column(DateTime, default=datetime.utcnow, index=True)
+    protocol = Column(String) # TCP, UDP
+    direction = Column(String) # outbound, inbound
+    source_ip = Column(String)
+    source_port = Column(Integer)
+    destination_ip = Column(String)
+    destination_port = Column(Integer)
+    bytes_sent = Column(Integer)
+    
+    session = relationship("AnalysisSession", backref="network_events")
