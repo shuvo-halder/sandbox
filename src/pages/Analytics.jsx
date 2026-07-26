@@ -18,7 +18,10 @@ export default function Analytics() {
       Promise.all([
         client.get(`/analytics/risk/${selectedSession}`),
         client.get(`/analytics/summary/${selectedSession}`),
-      ]).then(([r, s]) => { setRiskData(r.data); setSummary(s.data); }).catch(console.error);
+      ]).then(([r, s]) => { setRiskData(r.data); setSummary(s.data); }).catch(() => { setRiskData(null); setSummary(null); });
+    } else {
+      setRiskData(null);
+      setSummary(null);
     }
   }, [selectedSession]);
 
@@ -69,9 +72,9 @@ export default function Analytics() {
             )}
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 24, marginBottom: 24 }}>
+          <div className="dashboard-grid">
             {summary && summary.findings && summary.findings.length > 0 && (
-              <div className="card" style={{ marginBottom: 0 }}>
+              <div className="card dashboard-grid-main">
                 <div className="card-header"><div className="card-title">Detection Findings</div></div>
                 {summary.findings.map((f, i) => (
                   <div key={i} style={{ padding: '16px 0', borderBottom: i === summary.findings.length - 1 ? 'none' : '1px solid var(--color-border)' }}>
@@ -87,7 +90,7 @@ export default function Analytics() {
             )}
             
             {summary && summary.summary && (
-              <div className="card" style={{ marginBottom: 0 }}>
+              <div className="card dashboard-grid-side">
                 <div className="card-header"><div className="card-title">Analyst Summary</div></div>
                 <p style={{ color: 'var(--color-text-primary)', fontSize: 14, lineHeight: 1.6 }}>{summary.summary}</p>
               </div>

@@ -17,7 +17,9 @@ export default function Processes() {
 
   useEffect(() => {
     if (selectedSession) {
-      client.get(`/sessions/${selectedSession}/processes`).then(r => setProcesses(r.data.items || [])).catch(console.error);
+      client.get(`/sessions/${selectedSession}/processes`).then(r => setProcesses(r.data.items || [])).catch(() => setProcesses([]));
+    } else {
+      setProcesses([]);
     }
   }, [selectedSession]);
 

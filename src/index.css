@@ -311,6 +311,27 @@ a { color: var(--color-primary-light); text-decoration: none; }
 }
 .form-group input:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 2px rgba(59,130,246,0.2); }
 
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 6px 12px;
+}
+.search-bar input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--color-text-primary);
+  font-size: 13px;
+  width: 100%;
+}
+.search-bar:focus-within {
+  border-color: var(--color-primary);
+}
+
 /* Utilities */
 .risk-score { 
   display: inline-flex; align-items: center; justify-content: center; 
@@ -337,3 +358,91 @@ a { color: var(--color-primary-light); text-decoration: none; }
   stroke: var(--color-border);
 }
 .recharts-text { fill: var(--color-text-muted); }
+
+/* Dashboard Grids */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+.dashboard-grid-main {
+  margin-bottom: 0;
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+.dashboard-grid-side {
+  margin-bottom: 0;
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Responsive Overrides */
+@media (max-width: 1024px) {
+  .app-layout {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .sidebar-nav {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 10px;
+    gap: 10px;
+  }
+  .nav-section-title {
+    display: none;
+  }
+  .nav-link {
+    padding: 8px 12px;
+    white-space: nowrap;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+  }
+  .nav-link.active {
+    border-left: none;
+    border-bottom-color: var(--color-primary);
+    background: transparent;
+  }
+  .sidebar-footer {
+    display: none;
+  }
+  .main-content {
+    height: auto;
+    overflow-y: visible;
+  }
+  .content-area {
+    padding: 16px;
+    overflow-y: visible;
+  }
+  
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+  .dashboard-grid-main, .dashboard-grid-side {
+    height: auto;
+    min-height: 400px;
+  }
+}
+
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  .topbar {
+    padding: 0 16px;
+  }
+  .topbar-search input {
+    width: 100%;
+  }
+  .login-form {
+    padding: 32px 24px;
+  }
+}

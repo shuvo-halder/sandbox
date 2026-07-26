@@ -14,7 +14,9 @@ export default function Network() {
 
   useEffect(() => {
     if (selectedSession) {
-      client.get(`/sessions/${selectedSession}/network`).then(r => setEvents(r.data.items || [])).catch(console.error);
+      client.get(`/sessions/${selectedSession}/network`).then(r => setEvents(r.data.items || [])).catch(() => setEvents([]));
+    } else {
+      setEvents([]);
     }
   }, [selectedSession]);
 

@@ -6,10 +6,18 @@ export default function SandboxPage() {
   const [sandboxes, setSandboxes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(null);
+  const [error, setError] = useState(null);
 
   const fetchSandboxes = () => {
     setLoading(true);
-    client.get('/sandboxes').then(r => setSandboxes(r.data.items || [])).catch(console.error).finally(() => setLoading(false));
+    setError(null);
+    client.get('/sandboxes')
+      .then(r => setSandboxes(r.data.items || []))
+      .catch(err => {
+        console.error(err);
+        setError('Failed to load sandboxes.');
+      })
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
@@ -30,7 +38,7 @@ export default function SandboxPage() {
     }
   };
 
-  if (loading && sandboxes.length === 0) return <div className="loading-spinner"><div className="spinner" /></div>;
+  if (loading && sandboxes.length === 0 && !error) return <div className="loading-spinner"><div className="spinner" /></div>;
 
   return (
     <div>
@@ -40,6 +48,12 @@ export default function SandboxPage() {
           <RefreshCw size={16} className={loading ? "animate-spin" : ""} /> Refresh
         </button>
       </div>
+
+      {error && (
+        <div className="badge badge-danger" style={{ display: 'flex', width: '100%', padding: '12px 16px', marginBottom: 24, fontSize: 14 }}>
+           {error}
+        </div>
+      )}
       
       <div className="card">
         <table className="data-table">

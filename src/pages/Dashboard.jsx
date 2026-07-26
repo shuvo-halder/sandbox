@@ -10,7 +10,8 @@ export default function Dashboard() {
   
   // Real-time events state
   const [liveEvents, setLiveEvents] = useState([]);
-  const [chartData, setChartData] = useState(Array.from({ length: 20 }, (_, i) => ({ time: i, events: 0 })));
+  const [chartData, setChartData] = useState(Array.from({ length: 20 }, (_, i) => ({ time: '', events: 0 })));
+  const [error, setError] = useState(null);
   const wsRef = useRef(null);
 
   useEffect(() => {
@@ -20,7 +21,10 @@ export default function Dashboard() {
     ]).then(([s, a]) => {
       setStats(s.data);
       setActivities(a.data);
-    }).catch(console.error).finally(() => setLoading(false));
+    }).catch(err => {
+      console.error(err);
+      setError('Failed to load dashboard data. Engine might be offline.');
+    }).finally(() => setLoading(false));
 
     // Connect WebSocket
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -74,6 +78,12 @@ export default function Dashboard() {
           <LayoutDashboard size={24} /> Dashboard Overview
         </h2>
       </div>
+
+      {error && (
+        <div className="badge badge-danger" style={{ display: 'flex', width: '100%', padding: '12px 16px', marginBottom: 24, fontSize: 14 }}>
+          <AlertCircle size={18} style={{ marginRight: 8 }} /> {error}
+        </div>
+      )}
       
       <div className="stats-grid">
         <div className="stat-card">
@@ -97,8 +107,8 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 24, marginBottom: 24 }}>
-        <div className="card" style={{ marginBottom: 0, height: 400, display: 'flex', flexDirection: 'column' }}>
+      <div className="dashboard-grid">
+        <div className="card dashboard-grid-main">
           <div className="card-header"><div className="card-title">Real-Time Event Frequency</div></div>
           <div style={{ flex: 1, minHeight: 0 }}>
             <ResponsiveContainer width="100%" height="100%">
@@ -117,7 +127,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="card" style={{ marginBottom: 0, height: 400, display: 'flex', flexDirection: 'column' }}>
+        <div className="card dashboard-grid-side">
           <div className="card-header"><div className="card-title">Live Telemetry Stream</div></div>
           <div style={{ flex: 1, overflowY: 'auto', paddingRight: 8 }}>
             {liveEvents.length === 0 ? (
