@@ -160,6 +160,20 @@ async function startServer() {
     res.send(JSON.stringify({ report_id: req.params.id, status: 'Generated Analysis Report' }, null, 2));
   });
 
+  // Collector Ingestion endpoint for Go backend
+  router.post('/events', (req, res) => {
+    const eventData = req.body;
+    
+    // Broadcast the incoming Go collector event to connected React clients via WebSocket
+    wss.clients.forEach((client) => {
+      if (client.readyState === 1) { // WebSocket.OPEN
+        client.send(JSON.stringify(eventData));
+      }
+    });
+
+    res.json({ success: true, message: 'Event ingested successfully' });
+  });
+
   app.use('/api/v1', router);
 
   // Vite integration or Static File serving
