@@ -1,6 +1,18 @@
 version: '3.8'
 
 services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: mbs_user
+      POSTGRES_PASSWORD: mbs_password
+      POSTGRES_DB: mbs_sandbox
+    networks:
+      - mbs-net
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   # FastAPI Backend
   backend:
     build:
@@ -10,10 +22,12 @@ services:
       - "8000:8000"
     environment:
       - CORS_ORIGINS=http://localhost:3000
+      - DATABASE_URL=postgresql://mbs_user:mbs_password@db:5432/mbs_sandbox
     networks:
       - mbs-net
     depends_on:
       - redis
+      - db
 
   # Redis for celery/message broker
   redis:
@@ -21,7 +35,7 @@ services:
     networks:
       - mbs-net
 
-  # React Frontend (served via Node or Nginx)
+  # React Frontend
   frontend:
     build:
       context: .
@@ -34,17 +48,16 @@ services:
       - backend
 
   # Go Collector Sandbox (Simulated)
-  # In a real environment, this runs INSIDE the isolated sandbox.
   sandbox:
     build:
       context: .
       dockerfile: docker/Dockerfile.sandbox
-    privileged: true # Required for cgroups and some /proc interactions
+    privileged: true 
     environment:
       - MBS_API_URL=http://backend:8000/api/v1/events
     networks:
       - mbs-isolated-net
-      - mbs-net # For reporting to backend
+      - mbs-net 
     depends_on:
       - backend
 
@@ -53,4 +66,7 @@ networks:
     driver: bridge
   mbs-isolated-net:
     driver: bridge
-    internal: true # Isolated network for the sandbox
+    internal: true
+
+volumes:
+  postgres_data:
