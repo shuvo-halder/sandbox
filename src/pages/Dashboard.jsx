@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import client from '../api/client';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Activity, ShieldAlert, Cpu, Network, FileText } from 'lucide-react';
+import { Activity, ShieldAlert, Cpu, Network, FileText, LayoutDashboard, Search, AlertCircle } from 'lucide-react';
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null);
@@ -24,14 +24,14 @@ export default function Dashboard() {
 
     // Connect WebSocket
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const host = window.location.host; // Uses the same host/port as Vite/Express
+    const host = window.location.host; 
     wsRef.current = new WebSocket(`${protocol}//${host}/ws/events`);
     
     wsRef.current.onmessage = (event) => {
       const data = JSON.parse(event.data);
       
       setLiveEvents(prev => {
-        const newEvents = [data, ...prev].slice(0, 50); // Keep last 50 events
+        const newEvents = [data, ...prev].slice(0, 50);
         return newEvents;
       });
 
@@ -48,11 +48,11 @@ export default function Dashboard() {
 
   const getEventIcon = (type) => {
     switch (type) {
-      case 'process': return <Cpu size={16} className="text-info" />;
-      case 'network': return <Network size={16} className="text-warning" />;
-      case 'file': return <FileText size={16} className="text-primary" />;
-      case 'alert': return <ShieldAlert size={16} className="text-danger" />;
-      default: return <Activity size={16} />;
+      case 'process': return <Cpu size={16} className="text-info" style={{ color: 'var(--color-info)' }} />;
+      case 'network': return <Network size={16} className="text-warning" style={{ color: 'var(--color-warning)' }} />;
+      case 'file': return <FileText size={16} className="text-primary" style={{ color: 'var(--color-primary)' }} />;
+      case 'alert': return <ShieldAlert size={16} className="text-danger" style={{ color: 'var(--color-danger)' }} />;
+      default: return <Activity size={16} style={{ color: 'var(--color-text-secondary)' }} />;
     }
   };
 
@@ -61,7 +61,7 @@ export default function Dashboard() {
       case 'critical': return 'var(--color-danger)';
       case 'high': return 'var(--color-warning)';
       case 'medium': return 'var(--color-info)';
-      default: return 'var(--color-text-muted)';
+      default: return 'var(--color-text-primary)';
     }
   };
 
@@ -70,11 +70,9 @@ export default function Dashboard() {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <h2>Dashboard Overview</h2>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: 'var(--color-success)', boxShadow: '0 0 8px var(--color-success)' }} />
-          <span style={{ fontSize: 13, color: 'var(--color-text-muted)' }}>Live Sandbox Feed Active</span>
-        </div>
+        <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <LayoutDashboard size={24} /> Dashboard Overview
+        </h2>
       </div>
       
       <div className="stats-grid">
@@ -88,48 +86,59 @@ export default function Dashboard() {
         </div>
         <div className="stat-card">
           <div className="label">Avg Risk Score</div>
-          <div className="value danger">{stats?.avg_risk_score || 0}</div>
+          <div className="value danger" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+             {stats?.avg_risk_score || 0}
+             {stats?.avg_risk_score > 70 && <AlertCircle size={20} />}
+          </div>
         </div>
         <div className="stat-card">
-          <div className="label">Malicious</div>
+          <div className="label">Malicious Findings</div>
           <div className="value danger">{stats?.malicious_count || 0}</div>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16, marginBottom: 16 }}>
-        <div className="card" style={{ marginBottom: 0 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 24, marginBottom: 24 }}>
+        <div className="card" style={{ marginBottom: 0, height: 400, display: 'flex', flexDirection: 'column' }}>
           <div className="card-header"><div className="card-title">Real-Time Event Frequency</div></div>
-          <div style={{ height: 300 }}>
+          <div style={{ flex: 1, minHeight: 0 }}>
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData}>
+              <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
-                <XAxis dataKey="time" stroke="var(--color-text-muted)" fontSize={12} tickLine={false} />
-                <YAxis stroke="var(--color-text-muted)" fontSize={12} tickLine={false} axisLine={false} />
+                <XAxis dataKey="time" stroke="var(--color-text-muted)" fontSize={11} tickLine={false} axisLine={false} />
+                <YAxis stroke="var(--color-text-muted)" fontSize={11} tickLine={false} axisLine={false} />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-border)', borderRadius: '8px' }}
+                  contentStyle={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-border)', borderRadius: '8px', boxShadow: 'var(--shadow-md)' }}
                   itemStyle={{ color: 'var(--color-primary-light)' }}
+                  labelStyle={{ color: 'var(--color-text-primary)' }}
                 />
-                <Line type="monotone" dataKey="events" stroke="var(--color-primary)" strokeWidth={2} dot={false} activeDot={{ r: 6 }} animationDuration={300} />
+                <Line type="stepAfter" dataKey="events" stroke="var(--color-primary)" strokeWidth={2} dot={false} activeDot={{ r: 4 }} animationDuration={200} />
               </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="card" style={{ marginBottom: 0, display: 'flex', flexDirection: 'column' }}>
+        <div className="card" style={{ marginBottom: 0, height: 400, display: 'flex', flexDirection: 'column' }}>
           <div className="card-header"><div className="card-title">Live Telemetry Stream</div></div>
-          <div style={{ flex: 1, overflowY: 'auto', maxHeight: 300, paddingRight: 8 }}>
+          <div style={{ flex: 1, overflowY: 'auto', paddingRight: 8 }}>
             {liveEvents.length === 0 ? (
-              <div style={{ color: 'var(--color-text-muted)', textAlign: 'center', marginTop: 40, fontSize: 13 }}>Waiting for events...</div>
+              <div style={{ color: 'var(--color-text-muted)', textAlign: 'center', marginTop: 40, fontSize: 13, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                 <Activity size={24} />
+                 Waiting for events...
+              </div>
             ) : (
               liveEvents.map((ev, idx) => (
                 <div key={idx} style={{ display: 'flex', gap: 12, padding: '12px 0', borderBottom: '1px solid var(--color-border)', alignItems: 'flex-start' }}>
-                  <div style={{ marginTop: 2 }}>{getEventIcon(ev.type)}</div>
-                  <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <div style={{ marginTop: 2, padding: 6, background: 'var(--color-bg-tertiary)', borderRadius: '50%' }}>
+                     {getEventIcon(ev.type)}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
                       <span style={{ fontSize: 13, fontWeight: 600, color: getSeverityColor(ev.severity) }}>{ev.title}</span>
-                      <span style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>{new Date(ev.timestamp).toLocaleTimeString()}</span>
                     </div>
-                    <div style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>{ev.description}</div>
+                    <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginBottom: 4 }}>{ev.description}</div>
+                    <div style={{ fontSize: 11, color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
+                       {ev.session_id} • {new Date(ev.timestamp).toLocaleTimeString()}
+                    </div>
                   </div>
                 </div>
               ))
@@ -139,22 +148,36 @@ export default function Dashboard() {
       </div>
 
       <div className="card">
-        <div className="card-header"><div className="card-title">Recent Analysis Sessions</div></div>
-        <table className="data-table">
-          <thead><tr><th>Type</th><th>Title</th><th>Description</th><th>Status</th><th>Time</th></tr></thead>
-          <tbody>
-            {activities.map((a, i) => (
-              <tr key={i}>
-                <td><span className="badge badge-info">{a.type}</span></td>
-                <td>{a.title}</td>
-                <td style={{ color: 'var(--color-text-muted)' }}>{a.description}</td>
-                <td><span className={`badge badge-${a.status === 'running' ? 'success' : a.status === 'completed' ? 'success' : 'neutral'}`}>{a.status}</span></td>
-                <td style={{ color: 'var(--color-text-muted)', fontSize: 12 }}>{new Date(a.created_at).toLocaleString()}</td>
-              </tr>
-            ))}
-            {activities.length === 0 && <tr><td colSpan={5} style={{ textAlign: 'center', color: 'var(--color-text-muted)' }}>No recent activity</td></tr>}
-          </tbody>
-        </table>
+        <div className="card-header">
+           <div className="card-title">Recent Analysis Sessions</div>
+           <div className="search-bar" style={{ width: 250, padding: '6px 12px' }}>
+             <Search size={14} className="text-muted" />
+             <input type="text" placeholder="Filter sessions..." />
+           </div>
+        </div>
+        <div style={{ overflowX: 'auto' }}>
+          <table className="data-table">
+            <thead><tr><th>Type</th><th>Details</th><th>Status</th><th>Time</th></tr></thead>
+            <tbody>
+              {activities.map((a, i) => (
+                <tr key={i}>
+                  <td><span className="badge badge-info">{a.type}</span></td>
+                  <td>
+                    <div style={{ fontWeight: 500, color: 'var(--color-text-primary)' }}>{a.title}</div>
+                    <div style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 2 }}>{a.description}</div>
+                  </td>
+                  <td>
+                    <span className={`badge badge-${a.status === 'running' ? 'success' : a.status === 'completed' ? 'neutral' : 'warning'}`}>
+                       {a.status}
+                    </span>
+                  </td>
+                  <td style={{ color: 'var(--color-text-muted)', fontSize: 12, fontFamily: 'var(--font-mono)' }}>{new Date(a.created_at).toLocaleString()}</td>
+                </tr>
+              ))}
+              {activities.length === 0 && <tr><td colSpan={4} style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: '30px' }}>No recent activity</td></tr>}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
