@@ -1,0 +1,85 @@
+# ============================================
+# Malware Behavior Sandbox - Git Ignore
+# ============================================
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.staging
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# Go
+monitoring/monitor
+monitoring/*.exe
+monitoring/vendor/
+monitoring/.cache/
+
+# Node.js / React
+frontend/node_modules/
+frontend/build/
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+# Docker
+*.log
+docker-compose.override.yml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Database
+*.db
+*.sqlite3
+database/data/
+
+# Reports (generated)
+reports/output/*
+!reports/output/.gitkeep
+reports/samples/*.pdf
+reports/samples/*.html
+
+# Test / Coverage
+.pytest_cache/
+htmlcov/
+.coverage
+coverage.xml
+*.cover
+
+# Compiled
+*.o
+*.a
+*.dll
+*.exe
+
+# Temp files
+tmp/
+temp/
+*.tmp
+*.bak

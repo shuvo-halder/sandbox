@@ -1,0 +1,6 @@
+{
+  "name": "Malware Behavior Sandbox",
+  "description": "Security analysis platform for malware behavior sandboxing, process tracking, network monitoring, and report generation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
