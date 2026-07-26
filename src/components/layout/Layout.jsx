@@ -10,7 +10,8 @@ import {
   LineChart, 
   FileText, 
   LogOut,
-  User
+  User,
+  Search
 } from 'lucide-react';
 
 const navItems = [
@@ -65,7 +66,8 @@ export default function Layout() {
       
       <main className="main-content">
         <header className="topbar">
-          <div className="topbar-search">
+          <div className="search-bar" style={{ width: 400 }}>
+             <Search size={16} style={{ color: 'var(--color-text-muted)' }} />
              <input type="text" placeholder="Search sessions, hashes, or IP addresses..." />
           </div>
           <div className="topbar-actions">

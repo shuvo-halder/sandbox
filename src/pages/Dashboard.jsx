@@ -86,22 +86,22 @@ export default function Dashboard() {
       )}
       
       <div className="stats-grid">
-        <div className="stat-card">
+        <div className="stat-card info">
           <div className="label">Total Sandboxes</div>
           <div className="value info">{stats?.total_sandboxes || 0}</div>
         </div>
-        <div className="stat-card">
+        <div className="stat-card success">
           <div className="label">Active Sandboxes</div>
           <div className="value success">{stats?.active_sandboxes || 0}</div>
         </div>
-        <div className="stat-card">
+        <div className={`stat-card ${stats?.avg_risk_score > 70 ? 'danger' : 'warning'}`}>
           <div className="label">Avg Risk Score</div>
-          <div className="value danger" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className={`value ${stats?.avg_risk_score > 70 ? 'danger' : 'warning'}`} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
              {stats?.avg_risk_score || 0}
              {stats?.avg_risk_score > 70 && <AlertCircle size={20} />}
           </div>
         </div>
-        <div className="stat-card">
+        <div className="stat-card danger">
           <div className="label">Malicious Findings</div>
           <div className="value danger">{stats?.malicious_count || 0}</div>
         </div>
@@ -184,7 +184,16 @@ export default function Dashboard() {
                   <td style={{ color: 'var(--color-text-muted)', fontSize: 12, fontFamily: 'var(--font-mono)' }}>{new Date(a.created_at).toLocaleString()}</td>
                 </tr>
               ))}
-              {activities.length === 0 && <tr><td colSpan={4} style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: '30px' }}>No recent activity</td></tr>}
+              {activities.length === 0 && (
+                <tr>
+                  <td colSpan={4} style={{ textAlign: 'center', padding: '60px 20px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, color: 'var(--color-text-muted)' }}>
+                      <Activity size={32} style={{ opacity: 0.5 }} />
+                      <div style={{ fontSize: 14 }}>No recent activity found.</div>
+                    </div>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

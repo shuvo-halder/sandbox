@@ -166,6 +166,16 @@ a { color: var(--color-primary-light); text-decoration: none; }
   padding: 24px; 
   margin-bottom: 24px; 
   box-shadow: var(--shadow-sm);
+  position: relative;
+}
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.2), transparent);
 }
 .card-header { 
   display: flex; 
@@ -177,26 +187,46 @@ a { color: var(--color-primary-light); text-decoration: none; }
   font-size: 16px; 
   font-weight: 600; 
   color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 .stats-grid { 
   display: grid; 
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
-  gap: 20px; 
+  gap: 24px; 
   margin-bottom: 32px; 
 }
 .stat-card { 
   background: var(--color-bg-card); 
   border: 1px solid var(--color-border); 
   border-radius: var(--radius-lg); 
-  padding: 20px; 
+  padding: 24px; 
   display: flex;
   flex-direction: column;
   box-shadow: var(--shadow-sm);
   transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
 }
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--color-border);
+  transition: all 0.3s ease;
+}
+.stat-card.info::before { background: var(--color-info); }
+.stat-card.success::before { background: var(--color-success); }
+.stat-card.danger::before { background: var(--color-danger); }
+.stat-card.warning::before { background: var(--color-warning); }
 .stat-card:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-md), 0 0 15px rgba(56, 189, 248, 0.05);
+  border-color: rgba(56, 189, 248, 0.3);
 }
 .stat-card .label { 
   font-size: 12px; 
@@ -204,13 +234,15 @@ a { color: var(--color-primary-light); text-decoration: none; }
   text-transform: uppercase; 
   letter-spacing: 0.5px; 
   font-weight: 600;
+  padding-left: 8px;
 }
 .stat-card .value { 
   font-size: 32px; 
   font-weight: 700; 
-  margin-top: 8px; 
+  margin-top: 12px; 
   font-family: var(--font-mono);
   letter-spacing: -1px;
+  padding-left: 8px;
 }
 .stat-card .value.danger { color: var(--color-danger); }
 .stat-card .value.warning { color: var(--color-warning); }
@@ -237,6 +269,9 @@ a { color: var(--color-primary-light); text-decoration: none; }
   font-size: 14px; 
   border-bottom: 1px solid var(--color-border); 
   color: var(--color-text-secondary);
+}
+.data-table tr {
+  transition: background 0.2s ease;
 }
 .data-table tr:hover { background: rgba(255,255,255,0.02); }
 
